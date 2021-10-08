@@ -69,6 +69,41 @@ RunMCA.matrix <- function(X, nmcs = 50, features = NULL, reduction.name = "MCA",
 }
 
 #' @rdname RunMCA
+#' @export
+RunMCA.dgCMatrix <- function(X, nmcs = 50, features = NULL, reduction.name = "MCA", ...) {
+    # preprocessing matrix
+    # ----------------------------------------------------
+    if (!is.null(features)) {
+        X <- X[features, ]
+    }
+    X <- X[sparseMatrixStats::rowVars(X) != 0, ]
+    X <- X[str_length(rownames(X)) > 0, ]
+    X <- X[!duplicated(rownames(X)), ]
+    cellsN <- colnames(X)
+    featuresN <- rownames(X)
+    tic()
+    message("Computing Fuzzy Matrix")
+    MCAPrepRes <- SparseMCAStep1(X)
+    toc()
+    message("Computing SVD")
+    tic()
+    SVD <- irlba::irlba(A = MCAPrepRes$Z, nv = nmcs + 1, nu = 1)[seq(3)]
+    toc()
+    message("Computing Coordinates")
+    tic()
+    MCA <- MCAStep2(Z = MCAPrepRes$Z, V = SVD$v[, -1], Dc = MCAPrepRes$Dc)
+    component <- paste0(reduction.name, "_", seq(ncol(MCA$cellsCoordinates)))
+    colnames(MCA$cellsCoordinates) <- component
+    colnames(MCA$featuresCoordinates) <- component
+    rownames(MCA$cellsCoordinates) <- cellsN
+    rownames(MCA$featuresCoordinates) <- featuresN
+    MCA$stdev <- SVD$d[-1]
+    class(MCA) <- "MCA"
+    toc()
+    return(MCA)
+}
+
+#' @rdname RunMCA
 #' @param assay Name of Assay MCA is being run on
 #' @export
 RunMCA.Seurat <- function(X, nmcs = 50, features = NULL, reduction.name = "mca", slot = "data", assay = DefaultAssay(X), ...) {

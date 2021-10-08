@@ -13,3 +13,7 @@ MCAStep2 <- function(Z, V, Dc) {
     .Call('_CelliD_MCAStep2', PACKAGE = 'CelliD', Z, V, Dc)
 }
 
+SparseMCAStep1 <- function(X) {
+    .Call('_CelliD_SparseMCAStep1', PACKAGE = 'CelliD', X)
+}
+
