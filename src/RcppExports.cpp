@@ -61,9 +61,10 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_CelliD_fastPDist", (DL_FUNC) &_CelliD_fastPDist, 2},
+    {"_CelliD_SparseMCAStep1", (DL_FUNC) &_CelliD_SparseMCAStep1, 1},
     {"_CelliD_MCAStep1", (DL_FUNC) &_CelliD_MCAStep1, 1},
     {"_CelliD_MCAStep2", (DL_FUNC) &_CelliD_MCAStep2, 3},
-    {"_CelliD_SparseMCAStep1", (DL_FUNC) &_CelliD_SparseMCAStep1, 1},
+
     {NULL, NULL, 0}
 };
 
